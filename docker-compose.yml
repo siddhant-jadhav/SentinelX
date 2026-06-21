@@ -1,0 +1,109 @@
+# ═══════════════════════════════════════════════════════════════
+# SentinelX — Docker Compose Orchestration
+# ═══════════════════════════════════════════════════════════════
+#
+# Usage:
+#   docker compose up --build        # Build & start all services
+#   docker compose up -d             # Start in background
+#   docker compose down              # Stop all services
+#   docker compose logs -f           # Stream logs
+#   docker compose logs backend -f   # Stream backend logs only
+#
+# ═══════════════════════════════════════════════════════════════
+
+services:
+  # ── FastAPI Backend ────────────────────────────────────────────
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: sentinelx-backend
+    restart: unless-stopped
+    ports:
+      - "${BACKEND_PORT:-8003}:8003"
+    environment:
+      - DATABASE_URL=sqlite:////data/sentinelx.db
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY:-sentinelx-change-me-in-production}
+      - OTX_API_KEY=${OTX_API_KEY:-}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-SentinelX@2024}
+      - ADMIN_USERNAME=${ADMIN_USERNAME:-admin}
+      - ADMIN_EMAIL=${ADMIN_EMAIL:-admin@sentinelx.local}
+      - ANALYST_PASSWORD=${ANALYST_PASSWORD:-analyst123}
+      - BACKEND_URL=http://localhost:8003
+      - DEBUG=${DEBUG:-false}
+    volumes:
+      - sentinelx-data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8003/health"]
+      interval: 30s
+      timeout: 10s
+      start_period: 15s
+      retries: 3
+    networks:
+      - sentinelx-net
+
+  # ── Streamlit Frontend ─────────────────────────────────────────
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    container_name: sentinelx-frontend
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_PORT:-8503}:8503"
+    environment:
+      - BACKEND_URL=http://backend:8003
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8503/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      start_period: 15s
+      retries: 3
+    networks:
+      - sentinelx-net
+
+  # ── Prometheus (Metrics Collector) ──────────────────────────────
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: sentinelx-prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - sentinelx-net
+
+  # ── Grafana (Monitoring Dashboard) ──────────────────────────────
+  grafana:
+    image: grafana/grafana:latest
+    container_name: sentinelx-grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards
+    depends_on:
+      - prometheus
+    networks:
+      - sentinelx-net
+
+# ── Volumes ──────────────────────────────────────────────────────
+volumes:
+  sentinelx-data:
+    driver: local
+
+# ── Networks ─────────────────────────────────────────────────────
+networks:
+  sentinelx-net:
+    driver: bridge

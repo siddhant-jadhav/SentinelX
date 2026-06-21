@@ -1,0 +1,8 @@
+# ═══════════════════════════════════════════════════════════════
+# SentinelX — Namespace
+# A namespace keeps all our app resources organized together
+# ═══════════════════════════════════════════════════════════════
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: sentinelx

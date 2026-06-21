@@ -1,0 +1,48 @@
+# ── SentinelX .dockerignore ──────────────────────────────────────
+
+# Version control
+.git
+.gitignore
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+dist/
+build/
+
+# IDE & editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Docker
+docker-compose.yml
+docker-compose.*.yml
+
+# Local database (volume-mounted in Docker)
+*.db
+sentinelx.db
+
+# Environment files (injected via Docker env vars)
+.env
+.env.*
+
+# Documentation
+*.md
+LICENSE
+
+# Gemini / agent data
+.gemini/
+
+# Misc
+*.log

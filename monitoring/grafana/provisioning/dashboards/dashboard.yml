@@ -1,0 +1,9 @@
+# This tells Grafana to auto-load our dashboard from a JSON file
+apiVersion: 1
+
+providers:
+  - name: "SentinelX"
+    folder: ""
+    type: file
+    options:
+      path: /var/lib/grafana/dashboards

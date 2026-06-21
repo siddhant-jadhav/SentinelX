@@ -1,0 +1,32 @@
+# ═══════════════════════════════════════════════════════════════
+# SentinelX — Frontend Deployment
+# Runs the Streamlit frontend as a pod in Kubernetes
+# ═══════════════════════════════════════════════════════════════
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sentinelx-frontend
+  namespace: sentinelx
+  labels:
+    app: sentinelx-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sentinelx-frontend
+  template:
+    metadata:
+      labels:
+        app: sentinelx-frontend
+    spec:
+      containers:
+        - name: frontend
+          image: sentinelx-frontend:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8503
+
+          # Tell frontend where to find the backend API
+          env:
+            - name: BACKEND_URL
+              value: "http://sentinelx-backend:8003"

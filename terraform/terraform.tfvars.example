@@ -1,0 +1,12 @@
+# ═══════════════════════════════════════════════════════════════
+# SentinelX — Terraform Values
+# Copy this file to terraform.tfvars and fill in your values
+#   cp terraform.tfvars.example terraform.tfvars
+# ═══════════════════════════════════════════════════════════════
+
+aws_region    = "us-east-1"
+project_name  = "sentinelx"
+instance_type = "t2.micro"
+key_pair_name = "sentinelx-key"
+backend_port  = 8003
+frontend_port = 8503

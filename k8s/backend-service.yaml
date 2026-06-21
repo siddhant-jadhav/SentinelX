@@ -1,0 +1,15 @@
+# ═══════════════════════════════════════════════════════════════
+# SentinelX — Backend Service
+# Exposes the backend pod so other pods can reach it
+# ═══════════════════════════════════════════════════════════════
+apiVersion: v1
+kind: Service
+metadata:
+  name: sentinelx-backend
+  namespace: sentinelx
+spec:
+  selector:
+    app: sentinelx-backend
+  ports:
+    - port: 8003
+      targetPort: 8003

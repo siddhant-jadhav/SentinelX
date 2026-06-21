@@ -1,0 +1,16 @@
+# ═══════════════════════════════════════════════════════════════
+# SentinelX — PersistentVolume
+# Allocates storage on the host machine for our SQLite database
+# ═══════════════════════════════════════════════════════════════
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: sentinelx-pv
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /data/sentinelx

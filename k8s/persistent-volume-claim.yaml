@@ -1,0 +1,16 @@
+# ═══════════════════════════════════════════════════════════════
+# SentinelX — PersistentVolumeClaim
+# Requests storage from the PersistentVolume for the database
+# ═══════════════════════════════════════════════════════════════
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: sentinelx-pvc
+  namespace: sentinelx
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi

@@ -1,0 +1,39 @@
+# ═══════════════════════════════════════════════════════════════
+# SentinelX — Ingress
+# Routes external traffic to our frontend and backend services
+#
+# Prerequisites:
+#   minikube addons enable ingress
+#   echo "$(minikube ip) sentinelx.local" | sudo tee -a /etc/hosts
+# ═══════════════════════════════════════════════════════════════
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sentinelx-ingress
+  namespace: sentinelx
+spec:
+  ingressClassName: nginx
+  rules:
+    # Frontend — accessible at sentinelx.local
+    - host: sentinelx.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: sentinelx-frontend
+                port:
+                  number: 8503
+
+    # Backend API — accessible at sentinelx.local/api
+    - host: api.sentinelx.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: sentinelx-backend
+                port:
+                  number: 8003

@@ -1,0 +1,44 @@
+# ═══════════════════════════════════════════════════════════════
+# SentinelX — Backend Deployment
+# Runs the FastAPI backend server as a pod in Kubernetes
+# ═══════════════════════════════════════════════════════════════
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sentinelx-backend
+  namespace: sentinelx
+  labels:
+    app: sentinelx-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sentinelx-backend
+  template:
+    metadata:
+      labels:
+        app: sentinelx-backend
+    spec:
+      containers:
+        - name: backend
+          image: sentinelx-backend:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8003
+
+          # Load config and secrets as environment variables
+          envFrom:
+            - configMapRef:
+                name: sentinelx-config
+            - secretRef:
+                name: sentinelx-secrets
+
+          # Mount the database storage
+          volumeMounts:
+            - name: sqlite-data
+              mountPath: /data
+
+      volumes:
+        - name: sqlite-data
+          persistentVolumeClaim:
+            claimName: sentinelx-pvc

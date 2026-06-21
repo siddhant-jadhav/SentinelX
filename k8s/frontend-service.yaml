@@ -1,0 +1,18 @@
+# ═══════════════════════════════════════════════════════════════
+# SentinelX — Frontend Service
+# Exposes the frontend so users can access the web UI
+# Uses NodePort so it can be accessed from outside the cluster
+# ═══════════════════════════════════════════════════════════════
+apiVersion: v1
+kind: Service
+metadata:
+  name: sentinelx-frontend
+  namespace: sentinelx
+spec:
+  type: NodePort
+  selector:
+    app: sentinelx-frontend
+  ports:
+    - port: 8503
+      targetPort: 8503
+      nodePort: 30503
